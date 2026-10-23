@@ -1,0 +1,127 @@
+name: Build PocketLeads APK & Publish OTA Update
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Unpack Android Engine & Sync PocketLeads-latest.zip
+        run: |
+          python3 - << 'EOF'
+          import os, json, shutil, zipfile, datetime
+          from pathlib import Path
+
+          # 1. Unpack android-engine.zip if app/ is not already extracted
+          engine_zip = Path("android-engine.zip")
+          if engine_zip.exists():
+              with zipfile.ZipFile(engine_zip, "r") as zf:
+                  zf.extractall(".")
+              print("Extracted android-engine.zip successfully.")
+
+          # 2. Configure GitHub Raw OTA URL automatically in strings.xml
+          repo = os.environ.get("GITHUB_REPOSITORY", "")
+          branch = os.environ.get("GITHUB_REF_NAME", "main")
+          raw_base = f"https://raw.githubusercontent.com/{repo}/{branch}" if repo else "__OTA_BASE_URL__"
+
+          strings_path = Path("app/src/main/res/values/strings.xml")
+          if strings_path.exists() and repo:
+              txt = strings_path.read_text(encoding="utf-8")
+              txt = txt.replace("__OTA_BASE_URL__", raw_base)
+              strings_path.write_text(txt, encoding="utf-8")
+              print(f"Configured OTA Base URL: {raw_base}")
+
+          # 3. Extract PocketLeads-latest.zip into app/src/main/assets/pocketleads/
+          zip_path = Path("PocketLeads-latest.zip")
+          assets_ext = Path("app/src/main/assets/pocketleads")
+          assets_core = Path("app/src/main/assets/android_core")
+
+          if not zip_path.exists():
+              raise FileNotFoundError("PocketLeads-latest.zip not found in repository root!")
+
+          tmp_dir = Path("/tmp/pl_extract")
+          if tmp_dir.exists():
+              shutil.rmtree(tmp_dir)
+          tmp_dir.mkdir(parents=True)
+          with zipfile.ZipFile(zip_path, "r") as zf:
+              zf.extractall(tmp_dir)
+
+          manifest_files = list(tmp_dir.rglob("manifest.json"))
+          if not manifest_files:
+              raise RuntimeError("manifest.json not found inside PocketLeads-latest.zip!")
+
+          ext_root = manifest_files[0].parent
+          if assets_ext.exists():
+              shutil.rmtree(assets_ext)
+          shutil.copytree(ext_root, assets_ext)
+
+          # Copy permanent Android core runtime scripts into pocketleads/
+          if assets_core.exists():
+              for f in assets_core.iterdir():
+                  if f.is_file():
+                      shutil.copyfile(f, assets_ext / f.name)
+
+          # Inject chrome-android-polyfill.js into HTML entrypoints
+          for html_rel in ["views/index.html", "popup/license.html", "popup/index.html", "settings-page.html", "offscreen.html"]:
+              hp = assets_ext / html_rel
+              if hp.exists():
+                  htxt = hp.read_text(encoding="utf-8")
+                  if "/chrome-android-polyfill.js" not in htxt:
+                      htxt = htxt.replace("<head>", '<head>\n<script src="/chrome-android-polyfill.js"></script>', 1)
+                      hp.write_text(htxt, encoding="utf-8")
+
+          # Update ota-version.json so existing installed APKs auto-update immediately
+          manifest_data = json.loads((assets_ext / "manifest.json").read_text(encoding="utf-8"))
+          ver = manifest_data.get("version", "10.18.5")
+          ts = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+          ota_meta = {
+              "version": ver,
+              "buildId": f"{ver}-{ts}",
+              "zipFile": "PocketLeads-latest.zip",
+              "updatedAt": datetime.datetime.utcnow().isoformat() + "Z"
+          }
+          Path("ota-version.json").write_text(json.dumps(ota_meta, indent=2), encoding="utf-8")
+          print(f"Prepared PocketLeads v{ver} (buildId: {ver}-{ts}) for APK & OTA Live Update.")
+          EOF
+
+      - name: Update ota-version.json in Repository for Live OTA Users
+        run: |
+          git config user.name "PocketLeads Auto-Updater"
+          git config user.email "actions@github.com"
+          if ! git diff --quiet ota-version.json; then
+            git add ota-version.json
+            git commit -m "chore(ota): update live OTA metadata [skip ci]"
+            git push || true
+          fi
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: Build Signed Release & Debug APK
+        run: |
+          gradle assembleDebug assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk PocketLeads-PRO.apk
+
+      - name: Upload Ready-to-Install PocketLeads-PRO.apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: PocketLeads-PRO-APK-Download
+          path: |
+            PocketLeads-PRO.apk
