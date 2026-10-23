@@ -1,6 +1,6 @@
 {
   "version": "10.18.5",
-  "buildId": "10.18.5-20261023080206",
-  "zipFile": "PocketLeads-latest.zip",
-  "updatedAt": "2026-10-23T08:02:06.663971Z"
+  "buildId": "10.18.5-ota-v4-inprocess",
+  "zipFile": "PocketLeads-latest.zip?v=10.18.5-ota-v4-inprocess",
+  "updatedAt": "2026-10-23T13:42:00+05:30"
 }
