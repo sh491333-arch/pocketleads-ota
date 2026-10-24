@@ -1,4 +1,4 @@
-name: Build PocketLeads APK & Publish OTA Update
+name: Build PocketLeads APK & Windows EXE
 
 on:
   push:
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Unpack Android Engine & Sync PocketLeads-latest.zip for OTA Live Update
+      - name: Unpack Android Engine & Sync PocketLeads-latest.zip
         run: |
-          python3 - << 'EOF'
-          import os, json, shutil, zipfile, datetime
+          python3 - << 'PYEOF'
+          import os, shutil, zipfile
           from pathlib import Path
 
           engine_zip = Path("android-engine.zip")
@@ -57,7 +57,7 @@ jobs:
               for f in assets_core.iterdir():
                   if f.is_file():
                       shutil.copyfile(f, assets_ext / f.name)
-          EOF
+          PYEOF
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -84,7 +84,6 @@ jobs:
 
   build-windows-exe:
     runs-on: windows-latest
-    if: hashFiles('desktop-engine.zip') != ''
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -99,6 +98,9 @@ jobs:
         run: |
           import os, shutil, zipfile
           from pathlib import Path
+
+          if not Path("desktop-engine.zip").exists():
+              raise FileNotFoundError("Please upload desktop-engine.zip to the repository root!")
 
           with zipfile.ZipFile("desktop-engine.zip", "r") as zf:
               zf.extractall(".")
