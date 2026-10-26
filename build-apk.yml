@@ -15,20 +15,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Unpack Android Engine & Sync PocketLeads-latest.zip
+      - name: Unpack Android Engine & Sync PocketLeads-latest.zip for OTA Live Update
         run: |
           python3 - << 'EOF'
           import os, json, shutil, zipfile, datetime
           from pathlib import Path
 
-          # 1. Unpack android-engine.zip if app/ is not already extracted
           engine_zip = Path("android-engine.zip")
           if engine_zip.exists():
               with zipfile.ZipFile(engine_zip, "r") as zf:
                   zf.extractall(".")
               print("Extracted android-engine.zip successfully.")
 
-          # 2. Configure GitHub Raw OTA URL automatically in strings.xml
           repo = os.environ.get("GITHUB_REPOSITORY", "")
           branch = os.environ.get("GITHUB_REF_NAME", "main")
           raw_base = f"https://raw.githubusercontent.com/{repo}/{branch}" if repo else "__OTA_BASE_URL__"
@@ -38,9 +36,7 @@ jobs:
               txt = strings_path.read_text(encoding="utf-8")
               txt = txt.replace("__OTA_BASE_URL__", raw_base)
               strings_path.write_text(txt, encoding="utf-8")
-              print(f"Configured OTA Base URL: {raw_base}")
 
-          # 3. Extract PocketLeads-latest.zip into app/src/main/assets/pocketleads/
           zip_path = Path("PocketLeads-latest.zip")
           assets_ext = Path("app/src/main/assets/pocketleads")
           assets_core = Path("app/src/main/assets/android_core")
@@ -64,42 +60,85 @@ jobs:
               shutil.rmtree(assets_ext)
           shutil.copytree(ext_root, assets_ext)
 
-          # Copy permanent Android core runtime scripts into pocketleads/
           if assets_core.exists():
               for f in assets_core.iterdir():
                   if f.is_file():
                       shutil.copyfile(f, assets_ext / f.name)
 
-          # Inject chrome-android-polyfill.js into HTML entrypoints
+          acc_p = assets_ext / "libs" / "account.js"
+          if acc_p.exists():
+              atxt = acc_p.read_text(encoding="utf-8")
+              atxt = atxt.replace(
+                  "const worker = typeof document === 'undefined';",
+                  "const worker = typeof document === 'undefined' || !!(g && (g.__plInProcessAndroid || g.AndroidChromeBridge || (g.location && g.location.hostname === 'pocketleads.local')));",
+                  1
+              )
+              acc_p.write_text(atxt, encoding="utf-8")
+
+          for ctrl_rel in ["controllers/TaskManagerContainer.js", "controllers/background.js"]:
+              cp = assets_ext / ctrl_rel
+              if cp.exists():
+                  ctxt = cp.read_text(encoding="utf-8")
+                  if "__plInProcessAndroid" not in ctxt:
+                      ctxt = "if (!(typeof document !== 'undefined' && typeof location !== 'undefined' && location.protocol === 'chrome-extension:' && !window.__plInProcessAndroid)) {\n" + ctxt + "\n}\n"
+                      cp.write_text(ctxt, encoding="utf-8")
+
+          inproc_tags = '''    <script defer src="/libs/result-query.js"></script>
+    <script defer src="/libs/request-journal.js"></script>
+    <script defer src="/libs/ghost-parser.js"></script>
+    <script defer src="/libs/profile-tab.js"></script>
+    <script defer src="/libs/TaskManager.js"></script>
+    <script defer src="/controllers/TaskManagerContainer.js"></script>
+    <script defer src="/controllers/background.js"></script>
+    <script data-load-minify defer type="text/javascript" src="/controllers/index.js"></script>'''
+
           for html_rel in ["views/index.html", "popup/license.html", "popup/index.html", "settings-page.html", "offscreen.html"]:
               hp = assets_ext / html_rel
               if hp.exists():
                   htxt = hp.read_text(encoding="utf-8")
-                  if "/chrome-android-polyfill.js" not in htxt:
-                      htxt = htxt.replace("<head>", '<head>\n<script src="/chrome-android-polyfill.js"></script>', 1)
-                      hp.write_text(htxt, encoding="utf-8")
+                  if "<head>" in htxt and "chrome-ota-patch.js" not in htxt:
+                      inj = "<head>\n<!-- chrome-android-polyfill.js -->"
+                      if 'name="viewport"' not in htxt:
+                          inj += '\n<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+                      inj += '\n<script src="/chrome-ota-patch.js"></script>'
+                      htxt = htxt.replace("<head>", inj, 1)
+                  if html_rel == "views/index.html" and "/controllers/TaskManagerContainer.js" not in htxt:
+                      htxt = htxt.replace('    <script data-load-minify defer type="text/javascript" src="/controllers/index.js"></script>', inproc_tags, 1)
+                  hp.write_text(htxt, encoding="utf-8")
 
-          # Update ota-version.json so existing installed APKs auto-update immediately
+          navbar_p = assets_ext / "views" / "navbar.html"
+          if navbar_p.exists():
+              ntxt = navbar_p.read_text(encoding="utf-8")
+              if "chrome-android-polyfill.js" not in ntxt:
+                  navbar_p.write_text("<!-- chrome-android-polyfill.js -->\n" + ntxt, encoding="utf-8")
+
+          with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+              for root, dirs, files in os.walk(assets_ext):
+                  for f in files:
+                      full_p = Path(root) / f
+                      rel_p = full_p.relative_to(assets_ext)
+                      zf.write(full_p, arcname=str(rel_p))
+
           manifest_data = json.loads((assets_ext / "manifest.json").read_text(encoding="utf-8"))
           ver = manifest_data.get("version", "10.18.5")
           ts = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+          bid = f"{ver}-{ts}"
           ota_meta = {
               "version": ver,
-              "buildId": f"{ver}-{ts}",
-              "zipFile": "PocketLeads-latest.zip",
+              "buildId": bid,
+              "zipFile": f"PocketLeads-latest.zip?v={bid}",
               "updatedAt": datetime.datetime.utcnow().isoformat() + "Z"
           }
           Path("ota-version.json").write_text(json.dumps(ota_meta, indent=2), encoding="utf-8")
-          print(f"Prepared PocketLeads v{ver} (buildId: {ver}-{ts}) for APK & OTA Live Update.")
           EOF
 
-      - name: Update ota-version.json in Repository for Live OTA Users
+      - name: Publish OTA Live Update to Existing Phone Users
         run: |
           git config user.name "PocketLeads Auto-Updater"
           git config user.email "actions@github.com"
-          if ! git diff --quiet ota-version.json; then
-            git add ota-version.json
-            git commit -m "chore(ota): update live OTA metadata [skip ci]"
+          git add ota-version.json PocketLeads-latest.zip
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(ota): publish live OTA update [skip ci]"
             git push || true
           fi
 
@@ -125,3 +164,63 @@ jobs:
           name: PocketLeads-PRO-APK-Download
           path: |
             PocketLeads-PRO.apk
+
+  build-windows-exe:
+    runs-on: windows-latest
+    if: hashFiles('desktop-engine.zip') != ''
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Unpack Desktop Engine & Sync PocketLeads-latest.zip
+        shell: python
+        run: |
+          import os, shutil, zipfile
+          from pathlib import Path
+
+          with zipfile.ZipFile("desktop-engine.zip", "r") as zf:
+              zf.extractall(".")
+
+          app_dir = Path("desktop_app")
+          ext_dest = app_dir / "pocketleads"
+          core_dest = app_dir / "android_core"
+          if ext_dest.exists():
+              shutil.rmtree(ext_dest)
+
+          tmp_ext = Path("tmp_ext_win")
+          if tmp_ext.exists():
+              shutil.rmtree(tmp_ext)
+          tmp_ext.mkdir(parents=True)
+          with zipfile.ZipFile("PocketLeads-latest.zip", "r") as zf:
+              zf.extractall(tmp_ext)
+          manifests = list(tmp_ext.rglob("manifest.json"))
+          ext_root = manifests[0].parent if manifests else tmp_ext
+          shutil.copytree(ext_root, ext_dest)
+
+          if Path("android-engine.zip").exists():
+              tmp_eng = Path("tmp_eng_win")
+              with zipfile.ZipFile("android-engine.zip", "r") as zf:
+                  zf.extractall(tmp_eng)
+              src_core = tmp_eng / "app" / "src" / "main" / "assets" / "android_core"
+              if src_core.exists():
+                  if core_dest.exists():
+                      shutil.rmtree(core_dest)
+                  shutil.copytree(src_core, core_dest)
+
+      - name: Build Windows Desktop .EXE (Setup + Portable)
+        working-directory: desktop_app
+        run: |
+          npm install
+          npx electron-builder --win nsis portable
+
+      - name: Upload Ready-to-Install Windows Desktop .EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: PocketLeads-PRO-Windows-Desktop-EXE
+          path: |
+            desktop_app/dist/*.exe
