@@ -1,7 +1,6 @@
 {
   "version": "10.19.27",
-  "buildId": "v10.19.27-f0b00607e739",
-  "releasedAt": "2026-10-27T06:45:00Z",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.19.27 \u2014 Fixed DOM container nesting in views/index.html so Scraping History, Choose Columns & Export, Lead Details Sheet, Photo Lightbox, Completion Popup, and Licence Overlay are inside indexController scope; added AngularJS touch directives for mobile card gestures; improved Export, History restore, and Desktop row click handling."
+  "buildId": "10.19.27-20261027080504-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.27-20261027080504-v6",
+  "updatedAt": "2026-10-27T08:05:04.356784Z"
 }
