@@ -1,6 +1,7 @@
 {
   "version": "10.19.26",
-  "buildId": "10.19.26-20261027054945-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.26-20261027054945-v6",
-  "updatedAt": "2026-10-27T05:49:45.916845Z"
+  "buildId": "v10.19.26-708caf3835aa",
+  "releasedAt": "2026-10-27T04:29:21Z",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.19.26 \u2014 Deep session/URL/browsing cache cleanup on Clear Data, permanent licence & device ID persistence with auto-reactivation and background Admin Sheet inactive enforcement, responsive Desktop & Mobile Choose Columns & Scraping History modals, and compact single-line mobile lead selection bar."
 }
