@@ -1,7 +1,6 @@
 {
   "version": "10.19.27",
-  "buildId": "v10.19.27-f6a5c762fcd4",
-  "releasedAt": "2026-10-27T08:15:43Z",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.19.27 \u2014 Full 15-point verification release: Fixed DOM nesting of Lead Details/Modals & saveLocal bug so History, Export, Lead Card Click, and Photo Zoom work seamlessly; verified Clear Data cache wipe, Licence persistence & background Admin Sheet enforcement, Desktop/Mobile responsive modals, single-line selection bar, multi-photo gallery & URL resolution, input validation, and 5,000-website email/social extraction engine."
+  "buildId": "10.19.27-20261027113510-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.27-20261027113510-v6",
+  "updatedAt": "2026-10-27T11:35:10.161285Z"
 }
