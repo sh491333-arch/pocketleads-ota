@@ -1,6 +1,11 @@
 {
-  "version": "10.19.37",
-  "buildId": "10.19.37-20261028154700-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.37-20261028154700-v6",
-  "updatedAt": "2026-10-28T15:47:00.255044Z"
+  "version": "10.19.38",
+  "versionCode": 148,
+  "minApkVersion": "1.0.0",
+  "mandatory": false,
+  "zipUrl": "https://raw.githubusercontent.com/pocktleads/pocktleads-ota/main/PocketLeads-latest.zip",
+  "sha256": "31fc56028e773a2bf57a1b6af971ef8e88127634a64370aca3844da257fbe8fe",
+  "sizeBytes": 4264763,
+  "releasedAt": "2026-10-28T16:13:32Z",
+  "releaseNotes": "v10.19.38: Instant Start button launch (single preflight, zero duplicate Apps Script wait), O(1) memoized keyword/location counters, compact FNV-1a task signatures, windowed taskList/pincodeStatuses storage (zero main-thread freeze on 500-19,586+ pincodes), and ng-if diagnostics drawer."
 }
