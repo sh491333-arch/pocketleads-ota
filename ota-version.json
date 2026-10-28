@@ -1,8 +1,6 @@
 {
   "version": "10.19.31",
-  "buildId": "v10.19.31-c412411067a5",
-  "sha256": "c412411067a5d10dca762573e2332434c320d447440b804cefa105d30d2c64d7",
-  "releasedAt": "2026-10-27T18:45:31Z",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.19.31 \u2014 Bulletproof Security Hardening: Removed server apps_script_code.js (Admin Sheet ID) & internal docs from client ZIP/APK; added cryptographic tamper-detection signature (_plSig) on local licence cache; disabled Android WebView USB debugging & file:// access; locked OTA updates strictly to official HTTPS GitHub repo with Zip-Slip protection; blocked Electron DevTools & unsafe external protocols; added DOM XSS & CSV Formula Injection guards."
+  "buildId": "10.19.31-20261028053149-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.31-20261028053149-v6",
+  "updatedAt": "2026-10-28T05:31:49.709021Z"
 }
