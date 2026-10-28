@@ -1,6 +1,8 @@
 {
-  "version": "10.19.32",
-  "buildId": "10.19.32-20261028064131-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.32-20261028064131-v6",
-  "updatedAt": "2026-10-28T06:41:31.681251Z"
+  "version": "10.19.33",
+  "buildId": "v10.19.33-3d4d7554a6e5",
+  "sha256": "3d4d7554a6e5fef9d338f368a5d260e920971de20f8df344d76356bae5fc6dbb",
+  "releasedAt": "2026-10-28T07:03:07Z",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.19.33 \u2014 Fixed Mobile CRM HTML avatar & stat card overlap (image_81a158.jpg), added full Lead Details modal on card tap + Hold-Press/Checkbox Lead Selection & Bulk Delete/Export/Share toolbar in Mobile CRM; fixed APK startup replaying completion notification & 2 popups for already-completed runs; added Android Choose Folder (Save As) picker and direct native app Share chooser (WhatsApp, Gmail, Telegram, Drive)."
 }
