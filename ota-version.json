@@ -1,8 +1,6 @@
 {
   "version": "10.19.32",
-  "buildId": "v10.19.32-53d3f2836840",
-  "sha256": "53d3f2836840d65562bcf376ba142ae31abfd8ee4896fd7598045094b03e1613",
-  "releasedAt": "2026-10-28T06:08:51Z",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.19.32 \u2014 Mandatory first-time Country selection on install (saved permanently as user default until uninstall); removed top sound/vibration icon; removed filter chips & Hot/Warm/Cold badges from Leads page to maximize visible lead cards; upgraded Sales-Focus Mobile CRM HTML with new PocketLeads logo, business profile photos (with tap-to-zoom), 1-tap sales status pills, and quick note bar."
+  "buildId": "10.19.32-20261028064131-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.32-20261028064131-v6",
+  "updatedAt": "2026-10-28T06:41:31.681251Z"
 }
