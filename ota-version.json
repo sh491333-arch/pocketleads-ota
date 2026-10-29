@@ -1,15 +1,6 @@
 {
   "version": "10.19.42",
-  "versionCode": 152,
-  "buildId": "10.19.42-20261029100925-v42",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.42-20261029100925-v42",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.42-20261029100925-v42",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.42-20261029100925-v42",
-  "sha256": "1e02672dffb69d43368536408ab42b72c9f86fd9470f0bcd587a4baba360ede0",
-  "sizeBytes": 4299755,
-  "updatedAt": "2026-10-29T10:09:25Z",
-  "releasedAt": "2026-10-29T10:09:25Z",
-  "releaseNotes": "v10.19.42: Synchronized/merged Keywords & Locations drag-resize handles so pulling either handle resizes both cards together at the exact same level, fixed 100% extraction completion popup on Laptop/Desktop & Mobile, plus all v10.19.41 fixes (71+ locations progress sync, Start confirmation modal with Keep & Append / Clear / Cancel, and strict active-only duration timer)."
+  "buildId": "10.19.42-20261029101704-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.42-20261029101704-v6",
+  "updatedAt": "2026-10-29T10:17:04.401667Z"
 }
