@@ -1,6 +1,15 @@
 {
-  "version": "10.19.38",
-  "buildId": "10.19.38-20261028161752-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.38-20261028161752-v6",
-  "updatedAt": "2026-10-28T16:17:52.700874Z"
+  "version": "10.19.40",
+  "versionCode": 150,
+  "buildId": "10.19.40-20261029065840-v40",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.19.40-20261029065840-v40",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.40-20261029065840-v40",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.40-20261029065840-v40",
+  "sha256": "ec4f647dad48e31dd2d3a96be23c30f1c56a42e97484be0b3680af42b133e4a6",
+  "sizeBytes": 4291526,
+  "updatedAt": "2026-10-29T06:58:40Z",
+  "releasedAt": "2026-10-29T06:58:40Z",
+  "releaseNotes": "v10.19.40: Multi-layer Login Rate Limiting & Anti-Tamper Cryptographic Seal (_plAuthSealV40), strict licence-assigned Provider Priority & API Key enforcement (zero unassigned extraction), and full Old-APK OTA upgrade bridge (/libs/pl-ota-bridge-v40.js) so Share, Save as, Export, and Download work in both Old and New APKs."
 }
