@@ -1,15 +1,6 @@
 {
   "version": "10.19.43",
-  "versionCode": 153,
-  "buildId": "10.19.43-20261029104126-v43",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.43-20261029104126-v43",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.43-20261029104126-v43",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.43-20261029104126-v43",
-  "sha256": "907358642c4a1b2393689247d51ea6a7549cde6dc37591920e94267d140b6c3d",
-  "sizeBytes": 4300957,
-  "updatedAt": "2026-10-29T10:41:26Z",
-  "releasedAt": "2026-10-29T10:41:26Z",
-  "releaseNotes": "v10.19.43: Fixed duration timer jumping (strictly 1s monotonic active counter), enabled continuous extraction when APK is minimized or screen is off, added immediate stop on APK close or offline/flight mode, boosted multi-query extraction speed (4-lane 1-hop fastRamProxy), and fixed Scrappa Address Unavailable timeout with 3x auto-retry & provider failover."
+  "buildId": "10.19.43-20261029111513-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.43-20261029111513-v6",
+  "updatedAt": "2026-10-29T11:15:13.215829Z"
 }
