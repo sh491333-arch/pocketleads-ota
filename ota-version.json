@@ -1,15 +1,6 @@
 {
   "version": "10.19.45",
-  "versionCode": 155,
-  "buildId": "10.19.45-20261030142000-v45",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.45-20261030142000-v45",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.45-20261030142000-v45",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.45-20261030142000-v45",
-  "sha256": "01648bea38885cf89570e0bdb633abd74dd886ec1749f8447ac7876c5f3371d1",
-  "sizeBytes": 4328827,
-  "updatedAt": "2026-10-30T08:50:00Z",
-  "releasedAt": "2026-10-30T08:50:00Z",
-  "releaseNotes": "v10.19.45: Fixed instant Google Sheet Available Credit (+10/-10) live reflection in APK & Desktop app, added /health endpoint on Cloudflare Worker, and eliminated client credit clamping after extraction."
+  "buildId": "10.19.45-20261030101245-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.45-20261030101245-v6",
+  "updatedAt": "2026-10-30T10:12:45.148167Z"
 }
