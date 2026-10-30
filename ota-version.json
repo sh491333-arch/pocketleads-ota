@@ -1,15 +1,6 @@
 {
   "version": "10.19.44",
-  "versionCode": 154,
-  "buildId": "10.19.44-20261029201200-v44",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.44-20261029201200-v44",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.44-20261029201200-v44",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.44-20261029201200-v44",
-  "sha256": "9363fced3ab076d92621228078acfa9f66bedcf29c8df7603cada38d5ccf5d73",
-  "sizeBytes": 4328707,
-  "updatedAt": "2026-10-29T14:42:00Z",
-  "releasedAt": "2026-10-29T14:42:00Z",
-  "releaseNotes": "v10.19.44 (Solution B): Added Cloudflare Worker Edge Proxy integration (500+ concurrent users, 100% hidden server API keys & Sheet ID), zero-sheet-read RAM shield in Apps Script v42, 2-lane adaptive client concurrency, 12s coalesced metric sync, and 2-slot Ghost WebView memory guard."
+  "buildId": "10.19.44-20261030083426-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.44-20261030083426-v6",
+  "updatedAt": "2026-10-30T08:34:26.495328Z"
 }
