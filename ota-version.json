@@ -1,6 +1,15 @@
 {
-  "version": "10.19.45",
-  "buildId": "10.19.45-20261030101245-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.45-20261030101245-v6",
-  "updatedAt": "2026-10-30T10:12:45.148167Z"
+  "version": "10.19.48",
+  "versionCode": 158,
+  "buildId": "10.19.48-20261102114000-v48",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.19.48-20261102114000-v48",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.48-20261102114000-v48",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.48-20261102114000-v48",
+  "sha256": "42f88c2e7b108b295bca7834fa7f4a29c376b519beb60191c310646d5bbb780d",
+  "sizeBytes": 4339455,
+  "updatedAt": "2026-11-02T06:10:00Z",
+  "releasedAt": "2026-11-02T06:10:00Z",
+  "releaseNotes": "v10.19.48 Commercial Edition: Added Optional Email Sign-In & Cloud History Backup/Restore in Profile (restores past leads even after APK uninstall), Universal Auto-OTA Watchdog, Keyword/Location Clear buttons, 60FPS GPU Spinner, 5,000+ History Leads, and Universal Save As."
 }
