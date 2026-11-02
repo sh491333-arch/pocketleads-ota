@@ -1,15 +1,6 @@
 {
   "version": "10.19.49",
-  "versionCode": 159,
-  "buildId": "10.19.49-20261102121000-v49",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.49-20261102121000-v49",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.49-20261102121000-v49",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.49-20261102121000-v49",
-  "sha256": "6c6b1cb6b84e3bf0d034d377df582411d894e35d1cf045c116382a4e6f17184f",
-  "sizeBytes": 4339720,
-  "updatedAt": "2026-11-02T06:40:00Z",
-  "releasedAt": "2026-11-02T06:40:00Z",
-  "releaseNotes": "v10.19.49 Commercial Edition: Clean 'Sign In (Optional)' menu item above Logout opening dedicated Email Sign-In & Cloud History Backup/Restore page (no PIN needed, 100% working click flow), Universal Auto-OTA Watchdog, Keyword/Location Clear buttons, 60FPS GPU Spinner, and 5,000+ History Leads."
+  "buildId": "10.19.49-20261102064640-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.49-20261102064640-v6",
+  "updatedAt": "2026-11-02T06:46:40.906138Z"
 }
