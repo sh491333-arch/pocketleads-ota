@@ -1,15 +1,6 @@
 {
   "version": "10.19.51",
-  "versionCode": 161,
-  "buildId": "10.19.51-20261102125500-v51",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.51-20261102125500-v51",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.51-20261102125500-v51",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.51-20261102125500-v51",
-  "sha256": "e2dd8763b079bc1371decad15a026c5529046a96e77ca89c83446dfd467e3e1d",
-  "sizeBytes": 4341015,
-  "updatedAt": "2026-11-02T07:25:00Z",
-  "releasedAt": "2026-11-02T07:25:00Z",
-  "releaseNotes": "v10.19.51 Commercial Edition: Compact Profile menu + dynamic DOM injection guaranteeing 'Sign In (Optional)' is always visible right above Logout on all screens, opening the zero-PIN Email Sign-In & Cloud History Backup/Restore modal."
+  "buildId": "10.19.51-20261102080112-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.51-20261102080112-v6",
+  "updatedAt": "2026-11-02T08:01:12.064990Z"
 }
