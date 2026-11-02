@@ -1,15 +1,6 @@
 {
   "version": "10.19.47",
-  "versionCode": 157,
-  "buildId": "10.19.47-20261102112500-v47",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.47-20261102112500-v47",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.47-20261102112500-v47",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.47-20261102112500-v47",
-  "sha256": "89d02c00e465117901cfada9041b53b8cee65916b2dcb9db150f938a1609a53c",
-  "sizeBytes": 4333675,
-  "updatedAt": "2026-11-02T05:55:00Z",
-  "releasedAt": "2026-11-02T05:55:00Z",
-  "releaseNotes": "v10.19.47 Commercial Edition: Added Keyword & Location Clear buttons, 60/120 FPS GPU Spinner Circle, 5,000+ Live / 50,000+ IDB History Leads, Universal Save As Modal, and 2ms Cloudflare Edge Account & Metric acceleration."
+  "buildId": "10.19.47-20261102070354-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.47-20261102070354-v6",
+  "updatedAt": "2026-11-02T07:03:54.780994Z"
 }
