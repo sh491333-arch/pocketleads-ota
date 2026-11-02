@@ -1,6 +1,15 @@
 {
-  "version": "10.19.51",
-  "buildId": "10.19.51-20261102080112-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.51-20261102080112-v6",
-  "updatedAt": "2026-11-02T08:01:12.064990Z"
+  "version": "10.19.52",
+  "versionCode": 162,
+  "buildId": "10.19.52-20261102184200-v52",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.19.52-20261102184200-v52",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.52-20261102184200-v52",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.52-20261102184200-v52",
+  "sha256": "09f75b81691747e2fe7860b73daeca632679a09fde2ef8d88f991df8f4a8c855",
+  "sizeBytes": 4343676,
+  "updatedAt": "2026-11-02T13:12:00Z",
+  "releasedAt": "2026-11-02T13:12:00Z",
+  "releaseNotes": "v10.19.52 Commercial Edition: User History & Leads are NEVER stored in the Admin Magic Sheet. Added Personal Google Drive File Backup/Restore + Isolated Per-User Cloud Backup Vault."
 }
