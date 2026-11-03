@@ -1,6 +1,6 @@
 {
   "version": "10.19.53",
-  "buildId": "2026041753",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.19.53: Fixed Android APK Gradle build, fixed APK blank screen on minimize/switch/resume (WebView GPU surface & renderer recovery), cleaned 645 lines of unused Apps Script legacy code, and offloaded route selection & NumberChecker proxy to Cloudflare Edge."
+  "buildId": "10.19.53-20261103053626-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.53-20261103053626-v6",
+  "updatedAt": "2026-11-03T05:36:26.033016Z"
 }
