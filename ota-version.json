@@ -1,15 +1,6 @@
 {
   "version": "10.19.52",
-  "versionCode": 162,
-  "buildId": "10.19.52-20261103101500-v52",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.19.52-20261103101500-v52",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.52-20261103101500-v52",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.19.52-20261103101500-v52",
-  "sha256": "342cba662c1c687b185342421f74f8799d4c102f4b3740dad59b6cfad8534d4d",
-  "sizeBytes": 4351673,
-  "updatedAt": "2026-11-03T04:45:00Z",
-  "releasedAt": "2026-11-03T04:45:00Z",
-  "releaseNotes": "v10.19.52 Commercial Edition: Unhighlighted Profile Sign-In row, Verified Google Sign-In flow with Password & Licence ownership guard, 100% durable Cloud History restore after APK uninstall/reinstall, Samsung/Android dismissable notifications + Clear All, and 3-tab horizontal touch swipe navigation."
+  "buildId": "10.19.52-20261103050653-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.19.52-20261103050653-v6",
+  "updatedAt": "2026-11-03T05:06:53.790699Z"
 }
