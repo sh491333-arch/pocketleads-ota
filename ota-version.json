@@ -1,6 +1,6 @@
 {
-  "version": "10.19.53",
-  "buildId": "10.19.53-20261103053626-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.53-20261103053626-v6",
-  "updatedAt": "2026-11-03T05:36:26.033016Z"
+  "version": "10.19.54",
+  "buildId": "2026041754",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.19.54: Fixed duplicate session entries on Cloud History Sync, integrated NumberChecker.cloud API (https://api.numberchecker.cloud/api/v1), added strict 2,000 phone number minimum & user Available Credit rate-limit enforcement, and redesigned Scraping History into a full-page popup with multi-session bulk WhatsApp verification & live progress."
 }
