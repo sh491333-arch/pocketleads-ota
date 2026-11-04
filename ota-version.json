@@ -1,6 +1,6 @@
 {
-  "version": "10.19.54",
-  "buildId": "2026041754",
+  "version": "10.19.55",
+  "buildId": "2026041755",
   "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.19.54: Fixed duplicate session entries on Cloud History Sync, integrated NumberChecker.cloud API (https://api.numberchecker.cloud/api/v1), added strict 2,000 phone number minimum & user Available Credit rate-limit enforcement, and redesigned Scraping History into a full-page popup with multi-session bulk WhatsApp verification & live progress."
+  "notes": "v10.19.55: Overhauled WhatsApp Number Verification System across APK, EXE, Cloudflare Edge, Apps Script & Google Sheets. Fixed 'requested provider has no usable configured row', added Step-by-Step WhatsApp Verification Studio, and added bidirectional Valid/Invalid/Unknown sync across Leads, History, IndexedDB & CSV/Excel exports."
 }
