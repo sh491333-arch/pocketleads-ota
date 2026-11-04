@@ -1,6 +1,6 @@
 {
-  "version": "10.19.55",
-  "buildId": "10.19.55-20261104120140-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.55-20261104120140-v6",
-  "updatedAt": "2026-11-04T12:01:40.163320Z"
+  "version": "10.19.57",
+  "buildId": "2026041755",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.19.57: Overhauled WhatsApp Number Verification System across APK, EXE, Cloudflare Edge, Apps Script & Google Sheets. Fixed 'requested provider has no usable configured row', added Step-by-Step WhatsApp Verification Studio, and added bidirectional Valid/Invalid/Unknown sync across Leads, History, IndexedDB & CSV/Excel exports."
 }
