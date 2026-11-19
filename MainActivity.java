@@ -8,8 +8,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.pm.PackageManager;
 import android.content.ContentValues;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -44,8 +46,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.phone.SmsRetriever;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.Status;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -127,7 +136,10 @@ public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_RESULT_CODE = 5102;
     private static final int CREATE_DOC_RESULT_CODE = 5105;
     private static final int GOOGLE_ACCOUNT_PICKER_RESULT_CODE = 5108;
+    private static final int SMS_CONSENT_REQUEST_CODE = 5109;
     private volatile String pendingGoogleAccountCallbackId = null;
+    private volatile String pendingSmsConsentCallbackId = null;
+    private BroadcastReceiver smsConsentReceiver = null;
     private volatile byte[] lastDownloadedBytes = null;
     private volatile Uri lastDownloadedUri = null;
     private volatile String lastDownloadedMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -377,8 +389,31 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        unregisterSmsConsentReceiverSafely();
         pauseAndPersistExtractionOnClose();
         super.onDestroy();
+    }
+
+    private void unregisterSmsConsentReceiverSafely() {
+        try {
+            if (smsConsentReceiver != null) {
+                unregisterReceiver(smsConsentReceiver);
+                smsConsentReceiver = null;
+            }
+        } catch (Exception ignored) {
+            smsConsentReceiver = null;
+        }
+    }
+
+    private String extractSixDigitOtpFromSms(String message) {
+        if (message == null || message.trim().isEmpty()) return "";
+        try {
+            Matcher m = Pattern.compile("\\b(\\d{6})\\b").matcher(message);
+            if (m.find()) return m.group(1);
+            Matcher m2 = Pattern.compile("(\\d{6})").matcher(message);
+            if (m2.find()) return m2.group(1);
+        } catch (Exception ignored) {}
+        return "";
     }
 
     private File getOtaLiveDir() {
@@ -1843,6 +1878,78 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void startSmsUserConsentAsync(final String cbId) {
+            mainHandler.post(() -> {
+                try {
+                    unregisterSmsConsentReceiverSafely();
+                    pendingSmsConsentCallbackId = cbId;
+
+                    smsConsentReceiver = new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            if (intent == null || !SmsRetriever.SMS_RETRIEVED_ACTION.equals(intent.getAction())) return;
+                            try {
+                                Bundle extras = intent.getExtras();
+                                if (extras == null) return;
+                                Status smsStatus = (Status) extras.get(SmsRetriever.EXTRA_STATUS);
+                                if (smsStatus == null) return;
+                                int code = smsStatus.getStatusCode();
+                                if (code == CommonStatusCodes.SUCCESS) {
+                                    Intent consentIntent = extras.getParcelable(SmsRetriever.EXTRA_CONSENT_INTENT);
+                                    if (consentIntent != null) {
+                                        startActivityForResult(consentIntent, SMS_CONSENT_REQUEST_CODE);
+                                    }
+                                } else if (code == CommonStatusCodes.TIMEOUT) {
+                                    unregisterSmsConsentReceiverSafely();
+                                    final String timeoutCb = pendingSmsConsentCallbackId;
+                                    pendingSmsConsentCallbackId = null;
+                                    if (timeoutCb != null && !timeoutCb.isEmpty()) {
+                                        invokeDashboardCallback(timeoutCb, "{\"ok\":false,\"timeout\":true}");
+                                    }
+                                }
+                            } catch (Exception e) {
+                                unregisterSmsConsentReceiverSafely();
+                            }
+                        }
+                    };
+
+                    IntentFilter filter = new IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION);
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        registerReceiver(smsConsentReceiver, filter, SmsRetriever.SEND_PERMISSION, null, Context.RECEIVER_EXPORTED);
+                    } else {
+                        registerReceiver(smsConsentReceiver, filter, SmsRetriever.SEND_PERMISSION, null);
+                    }
+
+                    // Google SMS User Consent API (without App Hash — null accepts any unknown sender)
+                    SmsRetriever.getClient(MainActivity.this)
+                            .startSmsUserConsent(null)
+                            .addOnFailureListener(e -> {
+                                unregisterSmsConsentReceiverSafely();
+                                final String failCb = pendingSmsConsentCallbackId;
+                                pendingSmsConsentCallbackId = null;
+                                if (failCb != null && !failCb.isEmpty()) {
+                                    invokeDashboardCallback(failCb, "{\"ok\":false,\"error\":\"SMS User Consent unavailable\"}");
+                                }
+                            });
+                } catch (Exception e) {
+                    unregisterSmsConsentReceiverSafely();
+                    pendingSmsConsentCallbackId = null;
+                    if (cbId != null && !cbId.isEmpty()) {
+                        invokeDashboardCallback(cbId, "{\"ok\":false,\"error\":\"SMS User Consent init failed\"}");
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void stopSmsUserConsent() {
+            mainHandler.post(() -> {
+                pendingSmsConsentCallbackId = null;
+                unregisterSmsConsentReceiverSafely();
+            });
+        }
+
+        @JavascriptInterface
         public void pickGoogleAccountAsync(final String cbId) {
             mainHandler.post(() -> {
                 try {
@@ -2011,6 +2118,45 @@ public class MainActivity extends Activity {
                         ).show());
                     }
                 });
+            }
+        } else if (requestCode == SMS_CONSENT_REQUEST_CODE) {
+            unregisterSmsConsentReceiverSafely();
+            final String cbId = pendingSmsConsentCallbackId;
+            pendingSmsConsentCallbackId = null;
+            try {
+                JSONObject out = new JSONObject();
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    String message = data.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE);
+                    String otp = extractSixDigitOtpFromSms(message);
+                    if (otp != null && otp.length() == 6) {
+                        out.put("ok", true);
+                        out.put("otp", otp);
+                        out.put("message", message != null ? message : "");
+                        if (cbId != null && !cbId.isEmpty()) {
+                            invokeDashboardCallback(cbId, out.toString());
+                        }
+                        if (dashboardWebView != null) {
+                            String js = "window.__onAndroidSmsOtpReceived && window.__onAndroidSmsOtpReceived("
+                                    + JSONObject.quote(otp) + ", "
+                                    + JSONObject.quote(message != null ? message : "") + ");";
+                            mainHandler.post(() -> {
+                                try {
+                                    if (dashboardWebView != null) dashboardWebView.evaluateJavascript(js, null);
+                                } catch (Exception ignored) {}
+                            });
+                        }
+                        return;
+                    }
+                }
+                out.put("ok", false);
+                out.put("cancelled", resultCode == Activity.RESULT_CANCELED);
+                if (cbId != null && !cbId.isEmpty()) {
+                    invokeDashboardCallback(cbId, out.toString());
+                }
+            } catch (Exception e) {
+                if (cbId != null && !cbId.isEmpty()) {
+                    invokeDashboardCallback(cbId, "{\"ok\":false}");
+                }
             }
         } else if (requestCode == GOOGLE_ACCOUNT_PICKER_RESULT_CODE) {
             final String cbId = pendingGoogleAccountCallbackId;

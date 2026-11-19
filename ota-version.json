@@ -1,6 +1,6 @@
 {
-  "version": "10.19.58",
-  "buildId": "10.19.58-20261104131701-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.19.58-20261104131701-v6",
-  "updatedAt": "2026-11-04T13:17:01.278024Z"
+  "version": "10.19.59",
+  "buildId": "2026111901",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.19.59: Replaced Licence Key login screen with Super-Fast Phone Number + 6-Digit Textplate OTP Login (Cloudflare Edge RAM directory check + 5-min HMAC OTP verification + Android Google SMS User Consent API auto-fill without App Hash). Existing licence/device/credit verification remains 100% intact under the hood."
 }
