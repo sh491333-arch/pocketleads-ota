@@ -1,6 +1,6 @@
 {
   "version": "10.20.05",
-  "buildId": "2026111907",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.20.05: SaaS Partner Workspace (Left Sidebar + Mobile Bottom Nav Bar + Overview/Customers/Slots/Activity + \u20b9804 profit), Full-Page Opaque 6-Box OTP Login with Verifying button spinner, and real-time OTPs Sent / Last Used At metrics in OTP SMS Config sheet."
+  "buildId": "10.20.05-20261119121501-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.20.05-20261119121501-v6",
+  "updatedAt": "2026-11-19T12:15:01.988925Z"
 }
