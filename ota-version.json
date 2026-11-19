@@ -1,6 +1,6 @@
 {
-  "version": "10.20.05",
-  "buildId": "10.20.05-20261119121501-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.20.05-20261119121501-v6",
-  "updatedAt": "2026-11-19T12:15:01.988925Z"
+  "version": "10.20.06",
+  "buildId": "2026111908",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.20.06: Vibrant Dark-Neon Partner Dashboard (matching mobile mockup) with 3-line slide-out drawer, 4 clickable gradient KPI cards, glowing Slot Overview, Recent Activity, My Customers, and fixed bottom navigation bar."
 }
