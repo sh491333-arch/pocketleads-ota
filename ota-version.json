@@ -1,6 +1,6 @@
 {
-  "version": "10.20.00",
-  "buildId": "10.20.00-20261119100412-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.20.00-20261119100412-v6",
-  "updatedAt": "2026-11-19T10:04:12.538760Z"
+  "version": "10.20.03",
+  "buildId": "2026111905",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.20.03: Full Phone-Number-First unification across all sheets & backend, Textplate 6-digit OTP login (5-min validity + Android Google SMS User Consent API), built-in 'Switch to Partner' Dashboard (1/3/5 wholesale slots + Admin direct Available Slots + WhatsApp share), and Autopilot Central/Individual API Pool with 80%/100% auto-shift & alerts."
 }
