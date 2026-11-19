@@ -1,6 +1,6 @@
 {
   "version": "10.20.04",
-  "buildId": "2026111906",
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.20.04: Upgraded Partner Dashboard into a Full-Screen Executive Partner Studio (not a popup) with live \u20b9804/customer profit analytics (Customer \u20b91,804/$19 | 1,00,000 Credits | Partner \u20b91,000) and added Google Maven Central mirror to eliminate CI 429 errors."
+  "buildId": "10.20.04-20261119114055-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.20.04-20261119114055-v6",
+  "updatedAt": "2026-11-19T11:40:55.582467Z"
 }
