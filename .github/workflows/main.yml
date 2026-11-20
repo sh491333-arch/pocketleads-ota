@@ -204,7 +204,6 @@ jobs:
 
   build-windows-exe:
     runs-on: windows-latest
-    if: hashFiles('desktop-engine.zip') != ''
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
