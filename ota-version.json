@@ -1,15 +1,6 @@
 {
   "version": "10.20.11",
-  "versionCode": 159,
-  "buildId": "10.20.11-20261120114109-v49",
-  "minApkVersion": "1.0.0",
-  "mandatory": true,
-  "zipFile": "PocketLeads-latest.zip?v=10.20.11-20261120114109-v49",
-  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.20.11-20261120114109-v49",
-  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.20.11-20261120114109-v49",
-  "sha256": "565c29b41d51e0166f3111657feafb0ea651d25e00fb5b1912883fbcdbc51f2d",
-  "sizeBytes": 4407887,
-  "updatedAt": "2026-11-20T11:41:09Z",
-  "releasedAt": "2026-11-20T11:41:09Z",
-  "releaseNotes": "v10.20.11: Cloudflare Edge Proxy + 40-User Concurrency Shield + Zero-Sheet-Read RAM Cache."
+  "buildId": "10.20.11-20261120114123-v6",
+  "zipFile": "PocketLeads-latest.zip?v=10.20.11-20261120114123-v6",
+  "updatedAt": "2026-11-20T11:41:23.221925Z"
 }
