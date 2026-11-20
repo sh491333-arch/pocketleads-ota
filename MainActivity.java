@@ -98,6 +98,7 @@ public class MainActivity extends Activity {
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
     private FrameLayout rootLayout;
+    private View nativeSplashOverlay;
     private FrameLayout ghostWorkerContainer;
     private WebView dashboardWebView;
 
@@ -167,7 +168,7 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         rootLayout = new FrameLayout(this);
-        rootLayout.setBackgroundColor(Color.parseColor("#070B24"));
+        rootLayout.setBackgroundColor(Color.parseColor("#090D14"));
 
         ghostWorkerContainer = new FrameLayout(this);
         ghostWorkerContainer.setVisibility(View.INVISIBLE);
@@ -181,6 +182,38 @@ public class MainActivity extends Activity {
         ));
 
         setupWhatsAppOverlay();
+        // v10.20.11: Lightweight Native Branded Splash Overlay (Zero blank screen on cold boot!)
+        try {
+            android.widget.LinearLayout splash = new android.widget.LinearLayout(this);
+            splash.setOrientation(android.widget.LinearLayout.VERTICAL);
+            splash.setGravity(android.view.Gravity.CENTER);
+            splash.setBackgroundColor(Color.parseColor("#090D14"));
+            android.widget.TextView titleTv = new android.widget.TextView(this);
+            titleTv.setText("PocketLeads PRO");
+            titleTv.setTextColor(Color.parseColor("#F97316"));
+            titleTv.setTextSize(24f);
+            titleTv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            titleTv.setGravity(android.view.Gravity.CENTER);
+            android.widget.ProgressBar pb = new android.widget.ProgressBar(this);
+            pb.setIndeterminate(true);
+            android.widget.LinearLayout.LayoutParams pbLp = new android.widget.LinearLayout.LayoutParams(96, 96);
+            pbLp.topMargin = 32;
+            android.widget.TextView subTv = new android.widget.TextView(this);
+            subTv.setText("Loading workspace...");
+            subTv.setTextColor(Color.parseColor("#94A3B8"));
+            subTv.setTextSize(13f);
+            subTv.setGravity(android.view.Gravity.CENTER);
+            android.widget.LinearLayout.LayoutParams subLp = new android.widget.LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            subLp.topMargin = 18;
+            splash.addView(titleTv);
+            splash.addView(pb, pbLp);
+            splash.addView(subTv, subLp);
+            nativeSplashOverlay = splash;
+            rootLayout.addView(nativeSplashOverlay, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mainHandler.postDelayed(() -> hideNativeSplash(), 4200L);
+        } catch (Exception ignored) {}
         setContentView(rootLayout);
 
         if (Build.VERSION.SDK_INT >= 33) {
@@ -212,6 +245,24 @@ public class MainActivity extends Activity {
         dashboardWebView.loadUrl(DASHBOARD_START_URL);
         handleNotificationIntent(getIntent(), 700L);
         mainHandler.postDelayed(this::checkForOtaExtensionUpdate, 2500L);
+    }
+
+    private void hideNativeSplash() {
+        if (nativeSplashOverlay == null) return;
+        final View sp = nativeSplashOverlay;
+        nativeSplashOverlay = null;
+        mainHandler.post(() -> {
+            try {
+                sp.animate().alpha(0f).setDuration(220L).withEndAction(() -> {
+                    try {
+                        sp.setVisibility(View.GONE);
+                        if (rootLayout != null) rootLayout.removeView(sp);
+                    } catch (Exception ignored) {}
+                }).start();
+            } catch (Exception e) {
+                try { sp.setVisibility(View.GONE); } catch (Exception ignored) {}
+            }
+        });
     }
 
     @Override
@@ -274,14 +325,14 @@ public class MainActivity extends Activity {
     private void wakeAndHealDashboardWebView() {
         try {
             if (rootLayout != null) {
-                rootLayout.setBackgroundColor(Color.parseColor("#070B24"));
+                rootLayout.setBackgroundColor(Color.parseColor("#090D14"));
                 rootLayout.invalidate();
             }
             if (dashboardWebView == null) {
                 recreateDashboardWebViewSafely();
                 return;
             }
-            dashboardWebView.setBackgroundColor(Color.parseColor("#070B24"));
+            dashboardWebView.setBackgroundColor(Color.parseColor("#090D14"));
             dashboardWebView.setVisibility(View.VISIBLE);
             dashboardWebView.onResume();
             dashboardWebView.resumeTimers();
@@ -893,14 +944,17 @@ public class MainActivity extends Activity {
         }
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        if (Build.VERSION.SDK_INT >= 26) { try { settings.setSafeBrowsingEnabled(false); } catch (Exception ignored) {} }
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
         settings.setSupportZoom(true);
         settings.setBuiltInZoomControls(true);
         settings.setDisplayZoomControls(false);
-        webView.setBackgroundColor(Color.parseColor("#070B24"));
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        webView.setBackgroundColor(Color.parseColor("#090D14"));
+        webView.setLayerType(View.LAYER_TYPE_NONE, null); // v10.20.11: Prevents blank GPU screen on MediaTek/MIUI/Oppo/Vivo
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
@@ -944,8 +998,9 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                hideNativeSplash();
                 try {
-                    view.setBackgroundColor(Color.parseColor("#070B24"));
+                    view.setBackgroundColor(Color.parseColor("#090D14"));
                     view.setVisibility(View.VISIBLE);
                     view.requestLayout();
                     view.invalidate();
@@ -1021,7 +1076,7 @@ public class MainActivity extends Activity {
         LinearLayout topBar = new LinearLayout(this);
         topBar.setOrientation(LinearLayout.HORIZONTAL);
         topBar.setGravity(Gravity.CENTER_VERTICAL);
-        topBar.setBackgroundColor(Color.parseColor("#070B24"));
+        topBar.setBackgroundColor(Color.parseColor("#090D14"));
         int pad = dpToPx(10);
         topBar.setPadding(pad, pad, pad, pad);
 
