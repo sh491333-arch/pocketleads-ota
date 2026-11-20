@@ -88,14 +88,16 @@ jobs:
                       ctxt = "if (!(typeof document !== 'undefined' && typeof location !== 'undefined' && location.protocol === 'chrome-extension:' && !window.__plInProcessAndroid)) {\n" + ctxt + "\n}\n"
                       cp.write_text(ctxt, encoding="utf-8")
 
-          inproc_tags = '''    <script defer src="/libs/result-query.js"></script>
-    <script defer src="/libs/request-journal.js"></script>
-    <script defer src="/libs/ghost-parser.js"></script>
-    <script defer src="/libs/profile-tab.js"></script>
-    <script defer src="/libs/TaskManager.js"></script>
-    <script defer src="/controllers/TaskManagerContainer.js"></script>
-    <script defer src="/controllers/background.js"></script>
-    <script data-load-minify defer type="text/javascript" src="/controllers/index.js"></script>'''
+          inproc_tags = "\n".join([
+              '    <script defer src="/libs/result-query.js"></script>',
+              '    <script defer src="/libs/request-journal.js"></script>',
+              '    <script defer src="/libs/ghost-parser.js"></script>',
+              '    <script defer src="/libs/profile-tab.js"></script>',
+              '    <script defer src="/libs/TaskManager.js"></script>',
+              '    <script defer src="/controllers/TaskManagerContainer.js"></script>',
+              '    <script defer src="/controllers/background.js"></script>',
+              '    <script data-load-minify defer type="text/javascript" src="/controllers/index.js"></script>',
+          ])
 
           for html_rel in ["views/index.html", "popup/license.html", "popup/index.html", "settings-page.html", "offscreen.html"]:
               hp = assets_ext / html_rel
