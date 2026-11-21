@@ -1,6 +1,15 @@
 {
   "version": "10.24.00",
-  "buildId": 2026112105,
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.20.07: PocketLeads original orange/charcoal brand palette for Partner Dashboard + Hard-Coded Super Admin Panel strictly for 9330165250 (All Users, Partner-Wise filter, Credits, Role creation, 1-tap No-OTP User Dashboard Login)."
+  "versionCode": 159,
+  "buildId": "10.24.00-20261121120725-v49",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.24.00-20261121120725-v49",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.00-20261121120725-v49",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.00-20261121120725-v49",
+  "sha256": "dd8ad4018b3ad6e0705b8eefcf4a84b4f1189943e7643bb1467059525de4d77e",
+  "sizeBytes": 2248139,
+  "updatedAt": "2026-11-21T12:07:25Z",
+  "releasedAt": "2026-11-21T12:07:25Z",
+  "releaseNotes": "v10.24.00: Cloudflare Edge Proxy + 40-User Concurrency Shield + Zero-Sheet-Read RAM Cache."
 }
