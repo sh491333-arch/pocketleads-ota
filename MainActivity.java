@@ -245,6 +245,48 @@ public class MainActivity extends Activity {
         dashboardWebView.loadUrl(DASHBOARD_START_URL);
         handleNotificationIntent(getIntent(), 700L);
         mainHandler.postDelayed(this::checkForOtaExtensionUpdate, 2500L);
+        startPhonePushPoller();
+    }
+
+    private java.util.concurrent.ScheduledExecutorService phonePushPoller;
+
+    private void startPhonePushPoller() {
+        if (phonePushPoller != null) return;
+        phonePushPoller = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
+        phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 6L, 300L, java.util.concurrent.TimeUnit.SECONDS);
+    }
+
+    private void pollPhonePushNotifications() {
+        try {
+            java.net.URL u = new java.net.URL("https://pocketleads-edge.samimn7890.workers.dev/exec?action=getphonepush");
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) u.openConnection();
+            conn.setConnectTimeout(6000);
+            conn.setReadTimeout(8000);
+            if (conn.getResponseCode() != 200) return;
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+            try (InputStream is = conn.getInputStream()) {
+                byte[] buf = new byte[4096];
+                int r;
+                while ((r = is.read(buf)) != -1) bos.write(buf, 0, r);
+            }
+            org.json.JSONObject root = new org.json.JSONObject(new String(bos.toByteArray(), StandardCharsets.UTF_8));
+            org.json.JSONArray arr = root.optJSONArray("pushes");
+            if (arr == null || arr.length() == 0) return;
+            android.content.SharedPreferences prefs = getSharedPreferences("pl_phone_push_seen", MODE_PRIVATE);
+            for (int i = arr.length() - 1; i >= 0; i--) {
+                org.json.JSONObject p = arr.optJSONObject(i);
+                if (p == null) continue;
+                String pid = p.optString("id", "");
+                if (pid.isEmpty() || prefs.getBoolean("seen_" + pid, false)) continue;
+                prefs.edit().putBoolean("seen_" + pid, true).apply();
+                new AndroidChromeBridge().showRichNotification(
+                        p.optString("title", "PocketLeads"),
+                        p.optString("message", ""),
+                        p.optString("imageUrl", ""),
+                        p.optString("ctaUrl", "")
+                );
+            }
+        } catch (Exception ignored) {}
     }
 
     private void hideNativeSplash() {
@@ -1326,7 +1368,15 @@ public class MainActivity extends Activity {
                     int pFlags = Build.VERSION.SDK_INT >= 23
                             ? (android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE)
                             : android.app.PendingIntent.FLAG_UPDATE_CURRENT;
-                    nb.setContentIntent(android.app.PendingIntent.getActivity(MainActivity.this, 9012, openIntent, pFlags));
+                    android.app.PendingIntent openPi = android.app.PendingIntent.getActivity(MainActivity.this, 9012, openIntent, pFlags);
+                    nb.setContentIntent(openPi);
+                    if (ctaUrl != null && ctaUrl.startsWith("http")) {
+                        Intent ctaIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ctaUrl));
+                        android.app.PendingIntent ctaPi = android.app.PendingIntent.getActivity(MainActivity.this, 9013, ctaIntent, pFlags);
+                        nb.addAction(0, "Open Now", ctaPi);
+                    } else {
+                        nb.addAction(0, "Open App", openPi);
+                    }
                     nm.notify((int) (System.currentTimeMillis() & 0xFFFF), nb.build());
                 } catch (Exception ignored) {}
             }).start();

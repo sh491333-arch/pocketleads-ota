@@ -1,6 +1,6 @@
 {
-  "version": "10.21.01",
-  "buildId": "10.21.01-20261121084051-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.21.01-20261121084051-v6",
-  "updatedAt": "2026-11-21T08:40:51.171639Z"
+  "version": "10.22.00",
+  "buildId": 2026112102,
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.20.07: PocketLeads original orange/charcoal brand palette for Partner Dashboard + Hard-Coded Super Admin Panel strictly for 9330165250 (All Users, Partner-Wise filter, Credits, Role creation, 1-tap No-OTP User Dashboard Login)."
 }
