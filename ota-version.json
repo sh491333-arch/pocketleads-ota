@@ -1,6 +1,15 @@
 {
   "version": "10.24.02",
-  "buildId": 2026112105,
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.24.02: Live 7-day profile usage chart guaranteed visible, clickable Super Admin KPI filter cards, scrollable Setup Guide with original logo, sorted Profile menu, and ASAR-locked Windows EXE."
+  "versionCode": 159,
+  "buildId": "10.24.02-20261121132533-v49",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.24.02-20261121132533-v49",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.02-20261121132533-v49",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.02-20261121132533-v49",
+  "sha256": "baf4e5ec35dd5de1c8243e6e39d186fd926e5d8d84ef5924f1f62d27a3150822",
+  "sizeBytes": 2251545,
+  "updatedAt": "2026-11-21T13:25:33Z",
+  "releasedAt": "2026-11-21T13:25:33Z",
+  "releaseNotes": "v10.24.02: Cloudflare Edge Proxy + 40-User Concurrency Shield + Zero-Sheet-Read RAM Cache."
 }
