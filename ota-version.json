@@ -1,6 +1,6 @@
 {
-  "version": "10.24.00",
-  "buildId": "10.24.00-20261121121143-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.24.00-20261121121143-v6",
-  "updatedAt": "2026-11-21T12:11:43.373725Z"
+  "version": "10.24.01",
+  "buildId": 2026112105,
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.24.01: Fixed live per-user 7-day credit usage tracking & display + Super Admin all-users aggregated 7-day & total credit usage."
 }
