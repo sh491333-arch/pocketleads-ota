@@ -246,6 +246,7 @@ public class MainActivity extends Activity {
         handleNotificationIntent(getIntent(), 700L);
         mainHandler.postDelayed(this::checkForOtaExtensionUpdate, 2500L);
         startPhonePushPoller();
+        PocketLeadsPushJobService.schedulePeriodicPushJob(this);
     }
 
     private java.util.concurrent.ScheduledExecutorService phonePushPoller;
@@ -1321,6 +1322,53 @@ public class MainActivity extends Activity {
     }
 
     public class AndroidChromeBridge {
+        @JavascriptInterface
+        public String getNotificationPermissionStatus() {
+            try {
+                android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                boolean enabled = nm == null || nm.areNotificationsEnabled();
+                if (!enabled) return "disabled";
+                if (Build.VERSION.SDK_INT >= 33) {
+                    boolean granted = checkSelfPermission("android.permission.POST_NOTIFICATIONS") == PackageManager.PERMISSION_GRANTED;
+                    return granted ? "granted" : "denied";
+                }
+                return "granted";
+            } catch (Exception e) {
+                return "granted";
+            }
+        }
+
+        @JavascriptInterface
+        public void requestNotificationPermission() {
+            mainHandler.post(() -> {
+                try {
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 5103);
+                    } else {
+                        openNotificationSettings();
+                    }
+                } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface
+        public void openNotificationSettings() {
+            mainHandler.post(() -> {
+                try {
+                    Intent intent = new Intent();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        intent.setAction(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                        intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, getPackageName());
+                    } else {
+                        intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                    }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } catch (Exception ignored) {}
+            });
+        }
+
         @JavascriptInterface
         public void showRichNotification(final String title, final String message, final String imageUrl, final String ctaUrl) {
             new Thread(() -> {
