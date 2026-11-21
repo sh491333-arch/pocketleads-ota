@@ -1,6 +1,15 @@
 {
   "version": "10.24.01",
-  "buildId": 2026112105,
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.24.01: Fixed live per-user 7-day credit usage tracking & display + Super Admin all-users aggregated 7-day & total credit usage."
+  "versionCode": 159,
+  "buildId": "10.24.01-20261121124503-v49",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.24.01-20261121124503-v49",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.01-20261121124503-v49",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.01-20261121124503-v49",
+  "sha256": "e984ff584f97e7ffbcfe2eb4d1efd15ae4351bc002e3a6220d4a324f1a4c4d98",
+  "sizeBytes": 2249259,
+  "updatedAt": "2026-11-21T12:45:03Z",
+  "releasedAt": "2026-11-21T12:45:03Z",
+  "releaseNotes": "v10.24.01: Cloudflare Edge Proxy + 40-User Concurrency Shield + Zero-Sheet-Read RAM Cache."
 }
