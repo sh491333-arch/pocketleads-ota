@@ -816,6 +816,14 @@ public class MainActivity extends Activity {
 
             String lowerPath = cleanPath.toLowerCase();
 
+            if (lowerPath.endsWith("india-pincodes.json")) {
+                try {
+                    InputStream pinIs = getAssets().open("india-pincodes.json");
+                    headers.put("Cache-Control", "public, max-age=604800");
+                    return new WebResourceResponse("application/json", "UTF-8", 200, "OK", headers, pinIs);
+                } catch (Exception ignored) {}
+            }
+
             // A) On-The-Fly HTML Auto-Patcher & Partial Healer for ANY Old or New Extension ZIP!
             if (lowerPath.endsWith(".html")) {
                 String html = readExtensionText(cleanPath);
@@ -1271,6 +1279,59 @@ public class MainActivity extends Activity {
     }
 
     public class AndroidChromeBridge {
+        @JavascriptInterface
+        public void showRichNotification(final String title, final String message, final String imageUrl, final String ctaUrl) {
+            new Thread(() -> {
+                try {
+                    android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (nm == null) return;
+                    String chId = "pocketleads_alerts_v2";
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        android.app.NotificationChannel ch = new android.app.NotificationChannel(
+                                chId, "PocketLeads Updates & Offers", android.app.NotificationManager.IMPORTANCE_HIGH);
+                        nm.createNotificationChannel(ch);
+                    }
+                    android.graphics.Bitmap bmp = null;
+                    if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                        try {
+                            if (imageUrl.startsWith("data:image/") && imageUrl.contains(",")) {
+                                byte[] raw = android.util.Base64.decode(imageUrl.substring(imageUrl.indexOf(',') + 1), android.util.Base64.DEFAULT);
+                                bmp = android.graphics.BitmapFactory.decodeByteArray(raw, 0, raw.length);
+                            } else if (imageUrl.startsWith("http")) {
+                                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(imageUrl).openConnection();
+                                conn.setConnectTimeout(6000);
+                                conn.setReadTimeout(8000);
+                                try (InputStream is = conn.getInputStream()) {
+                                    bmp = android.graphics.BitmapFactory.decodeStream(is);
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    android.app.Notification.Builder nb = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            ? new android.app.Notification.Builder(MainActivity.this, chId)
+                            : new android.app.Notification.Builder(MainActivity.this);
+                    nb.setSmallIcon(android.R.drawable.ic_dialog_info)
+                      .setContentTitle(title != null && !title.isEmpty() ? title : "PocketLeads PRO")
+                      .setContentText(message != null ? message : "")
+                      .setAutoCancel(true);
+                    if (bmp != null) {
+                        nb.setStyle(new android.app.Notification.BigPictureStyle()
+                                .bigPicture(bmp)
+                                .setSummaryText(message != null ? message : ""));
+                    } else if (message != null && message.length() > 45) {
+                        nb.setStyle(new android.app.Notification.BigTextStyle().bigText(message));
+                    }
+                    Intent openIntent = new Intent(MainActivity.this, MainActivity.class);
+                    openIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    int pFlags = Build.VERSION.SDK_INT >= 23
+                            ? (android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE)
+                            : android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+                    nb.setContentIntent(android.app.PendingIntent.getActivity(MainActivity.this, 9012, openIntent, pFlags));
+                    nm.notify((int) (System.currentTimeMillis() & 0xFFFF), nb.build());
+                } catch (Exception ignored) {}
+            }).start();
+        }
+
 
         @JavascriptInterface
         public void setViewportMode(final String mode) {
