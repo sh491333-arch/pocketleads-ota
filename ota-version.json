@@ -1,6 +1,6 @@
 {
-  "version": "10.24.01",
-  "buildId": "10.24.01-20261121124517-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.24.01-20261121124517-v6",
-  "updatedAt": "2026-11-21T12:45:17.160596Z"
+  "version": "10.24.02",
+  "buildId": 2026112105,
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.24.02: Live 7-day profile usage chart guaranteed visible, clickable Super Admin KPI filter cards, scrollable Setup Guide with original logo, sorted Profile menu, and ASAR-locked Windows EXE."
 }
