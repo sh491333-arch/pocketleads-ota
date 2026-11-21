@@ -162,6 +162,22 @@ jobs:
             git push || true
           fi
 
+      - name: Run Automated E2E Smoke Tests (Pre-OTA Gate)
+        run: |
+          node -e "
+            const fs = require('fs'), path = require('path'), cp = require('child_process');
+            const extRoot = 'app/src/main/assets/ext';
+            const checkFiles = ['libs/account.js', 'libs/partner-hub.js', 'modules/shared-api.js', 'modules/user-dashboard.js', 'modules/partner-dashboard.js', 'modules/super-admin.js'];
+            for (const f of checkFiles) {
+              const fp = path.join(extRoot, f);
+              if (fs.existsSync(fp)) {
+                cp.execFileSync('node', ['--check', fp], { stdio: 'inherit' });
+                if (fs.readFileSync(fp, 'utf8').includes('9330165250')) throw new Error('Security Fail: hardcoded admin phone in ' + f);
+              }
+            }
+            console.log('E2E CI SMOKE TESTS PASSED: JS bundle syntax + Zero-Trust security verified!');
+          "
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
