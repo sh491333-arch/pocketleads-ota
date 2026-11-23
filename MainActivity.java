@@ -254,7 +254,7 @@ public class MainActivity extends Activity {
     private void startPhonePushPoller() {
         if (phonePushPoller != null) return;
         phonePushPoller = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
-        phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 6L, 300L, java.util.concurrent.TimeUnit.SECONDS);
+        phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 4L, 60L, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     private void pollPhonePushNotifications() {
