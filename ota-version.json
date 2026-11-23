@@ -1,6 +1,15 @@
 {
   "version": "10.24.11",
-  "buildId": 2026112105,
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.24.07: Guaranteed device push delivery (foreground + background + onResume + phone10 segment), clicking notification always opens PocketLeads APK."
+  "versionCode": 159,
+  "buildId": "10.24.11-20261123120334-v49",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.24.11-20261123120334-v49",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.11-20261123120334-v49",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.11-20261123120334-v49",
+  "sha256": "fb4c0e788d653283c4dd48ed15a8197630f179b9e77d122ad6f64d6592b91aa2",
+  "sizeBytes": 2263396,
+  "updatedAt": "2026-11-23T12:03:34Z",
+  "releasedAt": "2026-11-23T12:03:34Z",
+  "releaseNotes": "v10.24.11: Cloudflare Edge Proxy + 40-User Concurrency Shield + Zero-Sheet-Read RAM Cache."
 }
