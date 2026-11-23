@@ -280,10 +280,12 @@ public class MainActivity extends Activity {
                 String pid = p.optString("id", "");
                 if (pid.isEmpty() || prefs.getBoolean("seen_" + pid, false)) continue;
                 prefs.edit().putBoolean("seen_" + pid, true).apply();
-                new AndroidChromeBridge().showRichNotification(
-                        p.optString("title", "PocketLeads"),
+                PocketLeadsPushJobService.showBrandedBigPictureNotification(
+                        MainActivity.this,
+                        p.optString("title", "PocketLeads PRO"),
                         p.optString("message", ""),
                         p.optString("imageUrl", ""),
+                        p.optString("ctaText", "Open Now"),
                         p.optString("ctaUrl", "")
                 );
             }

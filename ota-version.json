@@ -1,6 +1,6 @@
 {
-  "version": "10.24.02",
-  "buildId": "10.24.02-20261121132549-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.24.02-20261121132549-v6",
-  "updatedAt": "2026-11-21T13:25:49.126981Z"
+  "version": "10.24.04",
+  "buildId": 2026112105,
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.24.04: Swipe-to-delete user notifications, Super Admin active/inactive/remove controls for all 3 notification channels, spring tab-bar motion, and OTP 3D flip + Verified celebration popup."
 }
