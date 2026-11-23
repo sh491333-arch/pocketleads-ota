@@ -1,6 +1,15 @@
 {
   "version": "10.24.05",
-  "buildId": 2026112105,
-  "zipFile": "PocketLeads-latest.zip",
-  "notes": "v10.24.05: Clean Partner topbar + Leave confirmation popup, fresh KV user 7-day & Used Credit fix, instant Admin self-push preview, Edit & Relaunch for all 3 notification channels, instant SWR cache-first UI, and calm OTP verification motion."
+  "versionCode": 159,
+  "buildId": "10.24.05-20261123070559-v49",
+  "minApkVersion": "1.0.0",
+  "mandatory": true,
+  "zipFile": "PocketLeads-latest.zip?v=10.24.05-20261123070559-v49",
+  "zipUrl": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.05-20261123070559-v49",
+  "url": "https://raw.githubusercontent.com/sh491333-arch/pocketleads-ota/main/PocketLeads-latest.zip?v=10.24.05-20261123070559-v49",
+  "sha256": "581fb2347e1ab4dc929274ceee4c8379fd2b076de775ebe298b04df89a36309f",
+  "sizeBytes": 2260169,
+  "updatedAt": "2026-11-23T07:05:59Z",
+  "releasedAt": "2026-11-23T07:05:59Z",
+  "releaseNotes": "v10.24.05: Cloudflare Edge Proxy + 40-User Concurrency Shield + Zero-Sheet-Read RAM Cache."
 }
