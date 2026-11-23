@@ -247,9 +247,27 @@ public class MainActivity extends Activity {
         mainHandler.postDelayed(this::checkForOtaExtensionUpdate, 2500L);
         startPhonePushPoller();
         PocketLeadsPushJobService.schedulePeriodicPushJob(this);
+        syncFcmTokenWithWorker();
     }
 
     private java.util.concurrent.ScheduledExecutorService phonePushPoller;
+
+    private void syncFcmTokenWithWorker() {
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    try {
+                        if (!task.isSuccessful() || task.getResult() == null) return;
+                        String token = task.getResult().trim();
+                        if (token.isEmpty()) return;
+                        SharedPreferences prefs = getSharedPreferences("pl_push_prefs", MODE_PRIVATE);
+                        prefs.edit().putString("fcm_token", token).apply();
+                        String savedPhone = prefs.getString("phone10", "");
+                        PocketLeadsFirebaseMessagingService.registerFcmTokenWithWorker(getApplicationContext(), token, savedPhone);
+                    } catch (Exception ignored) {}
+                });
+        } catch (Throwable ignored) {}
+    }
 
     private void startPhonePushPoller() {
         if (phonePushPoller != null) return;
@@ -257,9 +275,15 @@ public class MainActivity extends Activity {
         phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 4L, 60L, java.util.concurrent.TimeUnit.SECONDS);
     }
 
+
+
     private void pollPhonePushNotifications() {
         try {
-            java.net.URL u = new java.net.URL("https://pocketleads-edge.samimn7890.workers.dev/exec?action=getphonepush");
+            SharedPreferences uPrefs = getSharedPreferences("pl_push_prefs", MODE_PRIVATE);
+            String savedPhone = uPrefs.getString("phone10", "");
+            String feedUrl = "https://pocketleads-edge.samimn7890.workers.dev/exec?action=getphonepush"
+                    + (savedPhone != null && !savedPhone.isEmpty() ? ("&phone=" + Uri.encode(savedPhone)) : "");
+            java.net.URL u = new java.net.URL(feedUrl);
             java.net.HttpURLConnection conn = (java.net.HttpURLConnection) u.openConnection();
             conn.setConnectTimeout(6000);
             conn.setReadTimeout(8000);
@@ -354,6 +378,9 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         wakeAndHealDashboardWebView();
+        if (phonePushPoller != null) {
+            phonePushPoller.execute(this::pollPhonePushNotifications);
+        }
         if (System.currentTimeMillis() - lastOtaCheckAtMs > 120000L) {
             mainHandler.postDelayed(this::checkForOtaExtensionUpdate, 3500L);
         }
@@ -1372,64 +1399,37 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void setPushUserPhone(final String phone10) {
+            try {
+                getSharedPreferences("pl_push_prefs", MODE_PRIVATE).edit()
+                        .putString("phone10", phone10 != null ? phone10.trim() : "")
+                        .apply();
+            } catch (Exception ignored) {}
+        }
+
+        @JavascriptInterface
+        public boolean markPushSeenIfNew(final String pushId) {
+            try {
+                if (pushId == null || pushId.trim().isEmpty()) return true;
+                SharedPreferences prefs = getSharedPreferences("pl_phone_push_seen", MODE_PRIVATE);
+                if (prefs.getBoolean("seen_" + pushId.trim(), false)) return false;
+                prefs.edit().putBoolean("seen_" + pushId.trim(), true).apply();
+                return true;
+            } catch (Exception ignored) {
+                return true;
+            }
+        }
+
+        @JavascriptInterface
         public void showRichNotification(final String title, final String message, final String imageUrl, final String ctaUrl) {
-            new Thread(() -> {
-                try {
-                    android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    if (nm == null) return;
-                    String chId = "pocketleads_alerts_v2";
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        android.app.NotificationChannel ch = new android.app.NotificationChannel(
-                                chId, "PocketLeads Updates & Offers", android.app.NotificationManager.IMPORTANCE_HIGH);
-                        nm.createNotificationChannel(ch);
-                    }
-                    android.graphics.Bitmap bmp = null;
-                    if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                        try {
-                            if (imageUrl.startsWith("data:image/") && imageUrl.contains(",")) {
-                                byte[] raw = android.util.Base64.decode(imageUrl.substring(imageUrl.indexOf(',') + 1), android.util.Base64.DEFAULT);
-                                bmp = android.graphics.BitmapFactory.decodeByteArray(raw, 0, raw.length);
-                            } else if (imageUrl.startsWith("http")) {
-                                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(imageUrl).openConnection();
-                                conn.setConnectTimeout(6000);
-                                conn.setReadTimeout(8000);
-                                try (InputStream is = conn.getInputStream()) {
-                                    bmp = android.graphics.BitmapFactory.decodeStream(is);
-                                }
-                            }
-                        } catch (Exception ignored) {}
-                    }
-                    android.app.Notification.Builder nb = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            ? new android.app.Notification.Builder(MainActivity.this, chId)
-                            : new android.app.Notification.Builder(MainActivity.this);
-                    nb.setSmallIcon(android.R.drawable.ic_dialog_info)
-                      .setContentTitle(title != null && !title.isEmpty() ? title : "PocketLeads PRO")
-                      .setContentText(message != null ? message : "")
-                      .setAutoCancel(true);
-                    if (bmp != null) {
-                        nb.setStyle(new android.app.Notification.BigPictureStyle()
-                                .bigPicture(bmp)
-                                .setSummaryText(message != null ? message : ""));
-                    } else if (message != null && message.length() > 45) {
-                        nb.setStyle(new android.app.Notification.BigTextStyle().bigText(message));
-                    }
-                    Intent openIntent = new Intent(MainActivity.this, MainActivity.class);
-                    openIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    int pFlags = Build.VERSION.SDK_INT >= 23
-                            ? (android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE)
-                            : android.app.PendingIntent.FLAG_UPDATE_CURRENT;
-                    android.app.PendingIntent openPi = android.app.PendingIntent.getActivity(MainActivity.this, 9012, openIntent, pFlags);
-                    nb.setContentIntent(openPi);
-                    if (ctaUrl != null && ctaUrl.startsWith("http")) {
-                        Intent ctaIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ctaUrl));
-                        android.app.PendingIntent ctaPi = android.app.PendingIntent.getActivity(MainActivity.this, 9013, ctaIntent, pFlags);
-                        nb.addAction(0, "Open Now", ctaPi);
-                    } else {
-                        nb.addAction(0, "Open App", openPi);
-                    }
-                    nm.notify((int) (System.currentTimeMillis() & 0xFFFF), nb.build());
-                } catch (Exception ignored) {}
-            }).start();
+            new Thread(() -> PocketLeadsPushJobService.showBrandedBigPictureNotification(
+                    MainActivity.this,
+                    title,
+                    message,
+                    imageUrl,
+                    "Open PocketLeads",
+                    ctaUrl
+            )).start();
         }
 
 

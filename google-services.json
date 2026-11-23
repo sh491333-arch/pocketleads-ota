@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "493321743995",
+    "project_id": "pocketleads-pro",
+    "storage_bucket": "pocketleads-pro.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493321743995:android:6129644348bd24f0213cde",
+        "android_client_info": {
+          "package_name": "com.pocketleads.pro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCljau6UEh4871edklpXG_BxA50hBlSDSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
