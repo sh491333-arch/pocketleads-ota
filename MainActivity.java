@@ -272,7 +272,12 @@ public class MainActivity extends Activity {
     private void startPhonePushPoller() {
         if (phonePushPoller != null) return;
         phonePushPoller = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
-        phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 4L, 60L, java.util.concurrent.TimeUnit.SECONDS);
+        long pollPeriodSec = 60L;
+        try {
+            String fcmTok = getSharedPreferences("pl_push_prefs", MODE_PRIVATE).getString("fcm_token", "");
+            if (fcmTok != null && !fcmTok.trim().isEmpty()) pollPeriodSec = 600L; // FCM active: 10-min safety net (cuts ~85% Worker requests!)
+        } catch (Exception ignored) {}
+        phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 5L, pollPeriodSec, java.util.concurrent.TimeUnit.SECONDS);
     }
 
 
