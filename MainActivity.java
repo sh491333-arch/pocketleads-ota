@@ -1422,13 +1422,16 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void showRichNotification(final String title, final String message, final String imageUrl, final String ctaUrl) {
+            mainHandler.post(() -> {
+                try { ensureNotificationPermissionOnMainThread(); } catch (Exception ignored) {}
+            });
             new Thread(() -> PocketLeadsPushJobService.showBrandedBigPictureNotification(
                     MainActivity.this,
                     title,
                     message,
-                    imageUrl,
+                    imageUrl != null ? imageUrl : "",
                     "Open PocketLeads",
-                    ctaUrl
+                    ctaUrl != null ? ctaUrl : ""
             )).start();
         }
 
