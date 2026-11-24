@@ -254,7 +254,9 @@ public class MainActivity extends Activity {
 
     private void syncFcmTokenWithWorker() {
         try {
-            com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+            com.google.firebase.messaging.FirebaseMessaging fm = com.google.firebase.messaging.FirebaseMessaging.getInstance();
+            fm.subscribeToTopic("all_users");
+            fm.getToken()
                 .addOnCompleteListener(task -> {
                     try {
                         if (!task.isSuccessful() || task.getResult() == null) return;
@@ -264,12 +266,28 @@ public class MainActivity extends Activity {
                         prefs.edit().putString("fcm_token", token).apply();
                         String savedPhone = prefs.getString("phone10", "");
                         PocketLeadsFirebaseMessagingService.registerFcmTokenWithWorker(getApplicationContext(), token, savedPhone);
+                        reschedulePhonePushPollerForFcm();
                     } catch (Exception ignored) {}
                 });
         } catch (Throwable ignored) {}
     }
 
-    private void startPhonePushPoller() {
+    private long activePollPeriodSec = 0L;
+
+    private synchronized void reschedulePhonePushPollerForFcm() {
+        try {
+            if (activePollPeriodSec == 600L) return;
+            if (phonePushPoller != null) {
+                phonePushPoller.shutdownNow();
+                phonePushPoller = null;
+            }
+            activePollPeriodSec = 600L;
+            phonePushPoller = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
+            phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 60L, 600L, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (Exception ignored) {}
+    }
+
+    private synchronized void startPhonePushPoller() {
         if (phonePushPoller != null) return;
         phonePushPoller = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
         long pollPeriodSec = 60L;
@@ -277,6 +295,7 @@ public class MainActivity extends Activity {
             String fcmTok = getSharedPreferences("pl_push_prefs", MODE_PRIVATE).getString("fcm_token", "");
             if (fcmTok != null && !fcmTok.trim().isEmpty()) pollPeriodSec = 600L; // FCM active: 10-min safety net (cuts ~85% Worker requests!)
         } catch (Exception ignored) {}
+        activePollPeriodSec = pollPeriodSec;
         phonePushPoller.scheduleAtFixedRate(this::pollPhonePushNotifications, 5L, pollPeriodSec, java.util.concurrent.TimeUnit.SECONDS);
     }
 
@@ -592,10 +611,25 @@ public class MainActivity extends Activity {
                 String remoteVersion = "";
                 String zipUrl = "";
 
-                // 1. Primary Instant Check: Query GitHub Contents API for `PocketLeads-latest.zip` SHA!
-                //    This detects any newly uploaded `PocketLeads-latest.zip` in <1 second EVEN IF the user
-                //    did NOT update `ota-version.json` and BEFORE GitHub Actions finishes running!
-                if (baseUrl.contains("raw.githubusercontent.com/")) {
+                // 0. Primary 4G-Safe Check: Cloudflare India-Edge OTA Proxy (zero GitHub rate limit, never blocked on Jio/Airtel 4G!)
+                try {
+                    String edgeOtaUrl = "https://pocketleads-edge.samimn7890.workers.dev/exec?action=otaversion&t=" + System.currentTimeMillis();
+                    byte[] edgeBytes = downloadUrlBytes(edgeOtaUrl, 12000);
+                    if (edgeBytes != null && edgeBytes.length > 10) {
+                        JSONObject eMeta = new JSONObject(new String(edgeBytes, StandardCharsets.UTF_8));
+                        String eVer = eMeta.optString("version", "").trim();
+                        String eBid = eMeta.optString("buildId", "").trim();
+                        String eZip = eMeta.optString("proxyZipUrl", "").trim();
+                        if (!eVer.isEmpty() || !eBid.isEmpty()) {
+                            remoteVersion = eVer;
+                            remoteBuildId = (eVer + "|" + eBid).trim();
+                            zipUrl = !eZip.isEmpty() ? eZip : ("https://pocketleads-edge.samimn7890.workers.dev/exec?action=otazip&v=" + Uri.encode(remoteBuildId));
+                        }
+                    }
+                } catch (Exception ignored) {}
+
+                // 1. Secondary Fallback: Query GitHub Contents API if Edge proxy didn't respond
+                if (remoteBuildId.isEmpty() && baseUrl.contains("raw.githubusercontent.com/")) {
                     try {
                         String afterHost = baseUrl.substring(baseUrl.indexOf("raw.githubusercontent.com/") + "raw.githubusercontent.com/".length());
                         String[] parts = afterHost.split("/");
@@ -643,7 +677,7 @@ public class MainActivity extends Activity {
                     return; // Already on this exact ZIP!
                 }
 
-                byte[] zipBytes = downloadUrlBytes(zipUrl, 60000);
+                byte[] zipBytes = downloadUrlBytes(zipUrl, 90000);
                 if (zipBytes == null || zipBytes.length < 1000) return;
 
                 if (extractAndInstallOtaZip(zipBytes)) {
@@ -661,23 +695,81 @@ public class MainActivity extends Activity {
                             .putString("installed_build_id", remoteBuildId)
                             .putString("installed_version", finalVer)
                             .apply();
-                    mainHandler.post(() -> {
-                        Toast.makeText(
-                                MainActivity.this,
-                                "PocketLeads Live Auto-Updated (v" + finalVer + ")!",
-                                Toast.LENGTH_LONG
-                        ).show();
-                        if (dashboardWebView != null) {
-                            dashboardWebView.clearCache(true);
-                            dashboardWebView.loadUrl(DASHBOARD_START_URL);
-                        }
-                    });
+                    mainHandler.post(() -> showOtaUpdateReadyPill(finalVer));
                 }
             } catch (Exception ignored) {
             } finally {
                 otaCheckInProgress.set(false);
             }
         });
+    }
+
+    private View otaReadyPillView;
+
+    private void showOtaUpdateReadyPill(final String versionLabel) {
+        try {
+            if (rootLayout == null) return;
+            if (otaReadyPillView != null) {
+                rootLayout.removeView(otaReadyPillView);
+                otaReadyPillView = null;
+            }
+            float dp = getResources().getDisplayMetrics().density;
+            LinearLayout pill = new LinearLayout(this);
+            pill.setOrientation(LinearLayout.HORIZONTAL);
+            pill.setGravity(Gravity.CENTER_VERTICAL);
+            int padH = Math.round(14 * dp);
+            int padV = Math.round(10 * dp);
+            pill.setPadding(padH, padV, padH, padV);
+
+            android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+            bg.setColor(Color.parseColor("#EE111827"));
+            bg.setCornerRadius(24 * dp);
+            bg.setStroke(Math.round(1.5f * dp), Color.parseColor("#F97316"));
+            pill.setBackground(bg);
+            if (Build.VERSION.SDK_INT >= 21) pill.setElevation(10 * dp);
+
+            TextView label = new TextView(this);
+            label.setText("✨ Update Ready (v" + versionLabel + ") — Tap to Restart");
+            label.setTextColor(Color.parseColor("#F8FAFC"));
+            label.setTextSize(13f);
+            label.setOnClickListener(v -> {
+                try {
+                    if (otaReadyPillView != null && rootLayout != null) {
+                        rootLayout.removeView(otaReadyPillView);
+                        otaReadyPillView = null;
+                    }
+                    if (dashboardWebView != null) {
+                        dashboardWebView.clearCache(true);
+                        dashboardWebView.loadUrl(DASHBOARD_START_URL);
+                    }
+                } catch (Exception ignored) {}
+            });
+
+            TextView dismiss = new TextView(this);
+            dismiss.setText("  ✕");
+            dismiss.setTextColor(Color.parseColor("#94A3B8"));
+            dismiss.setTextSize(14f);
+            dismiss.setOnClickListener(v -> {
+                try {
+                    if (otaReadyPillView != null && rootLayout != null) {
+                        rootLayout.removeView(otaReadyPillView);
+                        otaReadyPillView = null;
+                    }
+                } catch (Exception ignored) {}
+            });
+
+            pill.addView(label);
+            pill.addView(dismiss);
+
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.TOP | Gravity.CENTER_HORIZONTAL
+            );
+            lp.topMargin = Math.round(52 * dp);
+            otaReadyPillView = pill;
+            rootLayout.addView(pill, lp);
+        } catch (Exception ignored) {}
     }
 
     private boolean extractAndInstallOtaZip(byte[] zipBytes) {
