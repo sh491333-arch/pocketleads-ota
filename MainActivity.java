@@ -1562,8 +1562,8 @@ public class MainActivity extends Activity {
                     dialog.setOnDismissListener(d -> {
                         try {
                             payWeb.destroy();
-                            if (webView != null) {
-                                webView.evaluateJavascript("window.dispatchEvent(new CustomEvent('pl:payment-sheet-closed'));", null);
+                            if (dashboardWebView != null) {
+                                dashboardWebView.evaluateJavascript("window.dispatchEvent(new CustomEvent('pl:payment-sheet-closed'));", null);
                             }
                         } catch (Exception ignored) {}
                     });
