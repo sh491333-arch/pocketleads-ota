@@ -252,6 +252,34 @@ public class MainActivity extends Activity {
 
     private java.util.concurrent.ScheduledExecutorService phonePushPoller;
 
+    private static void registerFcmTokenWithWorkerSafe(final Context ctx, final String token, final String phone10) {
+        if (ctx == null || token == null || token.trim().isEmpty()) return;
+        new Thread(() -> {
+            try {
+                String devId = android.provider.Settings.Secure.getString(ctx.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+                if (devId == null || devId.trim().isEmpty()) devId = "android-fcm-device";
+                org.json.JSONObject body = new org.json.JSONObject();
+                body.put("action", "registerPushDevice");
+                body.put("deviceId", devId);
+                body.put("phone", phone10 != null ? phone10 : "");
+                body.put("fcmToken", token.trim());
+                body.put("platform", "android");
+                body.put("permStatus", "granted");
+                body.put("appVersion", "10.25.03");
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL("https://pocketleads-edge.samimn7890.workers.dev/exec").openConnection();
+                conn.setRequestMethod("POST");
+                conn.setConnectTimeout(6000);
+                conn.setReadTimeout(8000);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/json");
+                byte[] bytes = body.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                try (java.io.OutputStream os = conn.getOutputStream()) { os.write(bytes); }
+                conn.getResponseCode();
+                conn.disconnect();
+            } catch (Exception ignored) {}
+        }).start();
+    }
+
     private void syncFcmTokenWithWorker() {
         try {
             com.google.firebase.messaging.FirebaseMessaging fm = com.google.firebase.messaging.FirebaseMessaging.getInstance();
@@ -265,7 +293,7 @@ public class MainActivity extends Activity {
                         SharedPreferences prefs = getSharedPreferences("pl_push_prefs", MODE_PRIVATE);
                         prefs.edit().putString("fcm_token", token).apply();
                         String savedPhone = prefs.getString("phone10", "");
-                        PocketLeadsFirebaseMessagingService.registerFcmTokenWithWorker(getApplicationContext(), token, savedPhone);
+                        registerFcmTokenWithWorkerSafe(getApplicationContext(), token, savedPhone);
                         reschedulePhonePushPollerForFcm();
                     } catch (Exception ignored) {}
                 });
@@ -1448,6 +1476,107 @@ public class MainActivity extends Activity {
     }
 
     public class AndroidChromeBridge {
+
+        @JavascriptInterface
+        public void openInAppPaymentSheet(final String rawUrl) {
+            if (rawUrl == null || rawUrl.trim().isEmpty()) return;
+            final String targetUrl = rawUrl.trim();
+            runOnUiThread(() -> {
+                try {
+                    final android.app.Dialog dialog = new android.app.Dialog(MainActivity.this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+                    android.widget.LinearLayout root = new android.widget.LinearLayout(MainActivity.this);
+                    root.setOrientation(android.widget.LinearLayout.VERTICAL);
+                    root.setBackgroundColor(Color.parseColor("#090D14"));
+
+                    // Sleek top header bar
+                    android.widget.LinearLayout header = new android.widget.LinearLayout(MainActivity.this);
+                    header.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+                    header.setBackgroundColor(Color.parseColor("#111827"));
+                    header.setPadding(32, 24, 24, 24);
+                    header.setGravity(android.view.Gravity.CENTER_VERTICAL);
+
+                    android.widget.TextView titleTv = new android.widget.TextView(MainActivity.this);
+                    titleTv.setText("PocketLeads PRO • Secure Checkout");
+                    titleTv.setTextColor(Color.WHITE);
+                    titleTv.setTextSize(15f);
+                    titleTv.setTypeface(null, android.graphics.Typeface.BOLD);
+                    android.widget.LinearLayout.LayoutParams titleLp = new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                    header.addView(titleTv, titleLp);
+
+                    android.widget.Button closeBtn = new android.widget.Button(MainActivity.this);
+                    closeBtn.setText("✕ Close");
+                    closeBtn.setTextColor(Color.parseColor("#FDBA74"));
+                    closeBtn.setBackgroundColor(Color.TRANSPARENT);
+                    closeBtn.setTextSize(13.5f);
+                    closeBtn.setOnClickListener(v -> dialog.dismiss());
+                    header.addView(closeBtn);
+
+                    root.addView(header, new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                    WebView payWeb = new WebView(MainActivity.this);
+                    WebSettings ps = payWeb.getSettings();
+                    ps.setJavaScriptEnabled(true);
+                    ps.setDomStorageEnabled(true);
+                    ps.setJavaScriptCanOpenWindowsAutomatically(true);
+                    ps.setSupportMultipleWindows(false);
+                    android.webkit.CookieManager.getInstance().setAcceptCookie(true);
+                    android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(payWeb, true);
+
+                    payWeb.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                            Uri u = request.getUrl();
+                            if (u == null) return false;
+                            String urlStr = u.toString();
+                            String sc = u.getScheme() != null ? u.getScheme().toLowerCase() : "";
+                            // Launch PhonePe / GPay / Paytm / BHIM / Intent directly & return to APK!
+                            if ("upi".equals(sc) || "phonepe".equals(sc) || "tez".equals(sc) || "gpay".equals(sc)
+                                    || "paytmmp".equals(sc) || "bhim".equals(sc) || "credpay".equals(sc)) {
+                                try {
+                                    Intent upiIntent = new Intent(Intent.ACTION_VIEW, u);
+                                    startActivity(upiIntent);
+                                } catch (Exception ex) {
+                                    android.widget.Toast.makeText(MainActivity.this, "UPI app not installed on this device.", android.widget.Toast.LENGTH_SHORT).show();
+                                }
+                                return true;
+                            }
+                            if ("intent".equals(sc)) {
+                                try {
+                                    Intent parsed = Intent.parseUri(urlStr, Intent.URI_INTENT_SCHEME);
+                                    if (parsed != null) {
+                                        startActivity(parsed);
+                                        return true;
+                                    }
+                                } catch (Exception ignored) {}
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+
+                    root.addView(payWeb, new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+
+                    dialog.setOnDismissListener(d -> {
+                        try {
+                            payWeb.destroy();
+                            if (webView != null) {
+                                webView.evaluateJavascript("window.dispatchEvent(new CustomEvent('pl:payment-sheet-closed'));", null);
+                            }
+                        } catch (Exception ignored) {}
+                    });
+
+                    dialog.setContentView(root);
+                    dialog.show();
+                    payWeb.loadUrl(targetUrl);
+                } catch (Exception ex) {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))); } catch (Exception ignored) {}
+                }
+            });
+        }
+
         @JavascriptInterface
         public String getNotificationPermissionStatus() {
             try {

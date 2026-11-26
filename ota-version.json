@@ -1,6 +1,6 @@
 {
-  "version": "10.25.03",
-  "buildId": "10.25.03-20261124074422-v6",
-  "zipFile": "PocketLeads-latest.zip?v=10.25.03-20261124074422-v6",
-  "updatedAt": "2026-11-24T07:44:22.602660Z"
+  "version": "10.25.05",
+  "buildId": "10.25.03-20261124062853",
+  "zipFile": "PocketLeads-latest.zip",
+  "notes": "v10.24.07: Guaranteed device push delivery (foreground + background + onResume + phone10 segment), clicking notification always opens PocketLeads APK."
 }
